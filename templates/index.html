@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NL → Data Pipeline</title>
-    <!-- Link to the new CSS -->
+    <title>NL → Data Pipeline Builder</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -13,33 +12,54 @@
         <h1>NL → Data Pipeline Builder</h1>
         <p>Enter your natural language instruction below and generate Python pipeline code.</p>
 
-        <!-- Input area -->
-        <textarea id="nl_input" rows="4" placeholder="Type something like: Load sales.csv, join with customers.csv, remove missing values, save as output.csv"></textarea>
+        <textarea id="nl_input" rows="5" placeholder="Type something like: Load sales.csv, join with customers.csv, remove missing values, save as output.csv"></textarea>
 
-        <!-- Generate button -->
         <button onclick="generatePipeline()">Generate & Download Code</button>
 
-        <!-- Results area -->
-        <div id="results" style="margin-top:20px; white-space: pre-wrap;"></div>
+        <div id="results" class="code-box"></div>
     </div>
 
-    <!-- Footer -->
     <footer>
         Created by Pronit Ray |
         <a href="https://github.com/ptz07" target="_blank">GitHub</a> |
         <a href="https://www.linkedin.com/feed/" target="_blank">LinkedIn</a>
     </footer>
 
-    <!-- Optional JS for showing results -->
     <script>
-        function generatePipeline() {
+        async function generatePipeline() {
             const input = document.getElementById('nl_input').value;
             const results = document.getElementById('results');
 
-            // Dummy output, replace with Flask backend call
-            results.textContent = "Generated Python code for:\n" + input;
+            if (!input.trim()) {
+                results.textContent = "Please enter a natural language instruction.";
+                return;
+            }
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ instruction: input })
+                });
+
+                if (!response.ok) throw new Error("Server error");
+
+                const data = await response.json();
+                results.textContent = data.code;
+
+                // Trigger download
+                const blob = new Blob([data.code], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'generated_pipeline.py';
+                link.click();
+
+            } catch (err) {
+                results.textContent = "Error generating code: " + err.message;
+            }
         }
     </script>
 
 </body>
 </html>
+
