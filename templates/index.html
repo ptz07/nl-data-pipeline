@@ -14,7 +14,7 @@
 
         <textarea id="nl_input" rows="5" placeholder="Type something like: Load sales.csv, join with customers.csv, remove missing values, save as output.csv"></textarea>
 
-        <button onclick="generatePipeline()">Generate & Download Code</button>
+        <button id="generateBtn">Generate & Download Code</button>
 
         <div id="results" class="code-box"></div>
     </div>
@@ -26,9 +26,50 @@
     </footer>
 
     <script>
-        // Fully working JS with debug logs
-        async function generatePipeline() {
-            console.log("Button clicked");  // Debug: button click detected
+        // Fully working JS
+        document.getElementById('generateBtn').addEventListener('click', async function() {
+            console.log("Button clicked"); // debug log
 
             const input = document.getElementById('nl_input').value;
-            console.log("
+            console.log("Input value:", input);
+
+            const results = document.getElementById('results');
+            results.textContent = "Processing..."; // show immediate feedback
+
+            if (!input.trim()) {
+                results.textContent = "Please enter a natural language instruction.";
+                return;
+            }
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ instruction: input })
+                });
+
+                console.log("Fetch request sent");
+
+                if (!response.ok) throw new Error("Server returned " + response.status);
+
+                const data = await response.json();
+                console.log("Response data:", data);
+
+                results.textContent = data.code;
+
+                // Trigger download
+                const blob = new Blob([data.code], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'generated_pipeline.py';
+                link.click();
+
+            } catch (err) {
+                console.error("Error in generatePipeline():", err);
+                results.textContent = "Error generating code: " + err.message;
+            }
+        });
+    </script>
+
+</body>
+</html>
