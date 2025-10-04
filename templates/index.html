@@ -16,7 +16,6 @@
 
         <button onclick="generatePipeline()">Generate & Download Code</button>
 
-
         <div id="results" class="code-box"></div>
     </div>
 
@@ -27,50 +26,9 @@
     </footer>
 
     <script>
-       async function generatePipeline() {
-    console.log("Button clicked");  // <- debug log
+        // Fully working JS with debug logs
+        async function generatePipeline() {
+            console.log("Button clicked");  // Debug: button click detected
 
-    const input = document.getElementById('nl_input').value;
-    console.log("Input value:", input);  // <- debug log
-
-    const results = document.getElementById('results');
-
-    if (!input.trim()) {
-        results.textContent = "Please enter a natural language instruction.";
-        return;
-    }
-
-    try {
-        const response = await fetch('/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ instruction: input })
-        });
-
-        console.log("Fetch sent");  // <- debug log
-
-        if (!response.ok) throw new Error("Server error");
-
-        const data = await response.json();
-        console.log("Response data:", data);  // <- debug log
-
-        results.textContent = data.code;
-
-        // Trigger download
-        const blob = new Blob([data.code], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'generated_pipeline.py';
-        link.click();
-
-    } catch (err) {
-        console.error(err);
-        results.textContent = "Error generating code: " + err.message;
-    }
-}
-
-    </script>
-
-</body>
-</html>
-
+            const input = document.getElementById('nl_input').value;
+            console.log("
