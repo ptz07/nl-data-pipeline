@@ -1,25 +1,30 @@
-from flask import Flask, render_template, request, send_file
-from pipeline_engine import parse_instruction, generate_python_code
-import tempfile
+from flask import Flask, render_template, request, jsonify
+from pipeline_engine import generate_pipeline_code  # your existing logic
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route('/')
 def home():
-    steps = []
-    code = ""
-    download_path = None
-    if request.method == "POST":
-        instruction = request.form["instruction"]
-        steps = parse_instruction(instruction)
-        code = generate_python_code(steps)
-        if "download" in request.form:
-            # Save generated code into a temporary Python file
-            tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".py")
-            with open(tmp.name, "w") as f:
-                f.write(code)
-            return send_file(tmp.name, as_attachment=True, download_name="generated_pipeline.py")
-    return render_template("index.html", steps=steps, code=code)
+    return render_template('index.html')
 
+@app.route('/generate', methods=['POST'])
+def generate():
+    data = request.get_json()
+    instruction = data.get('instruction', '')
+
+    if not instruction.strip():
+        return jsonify({'code': "# No instruction provided"})
+
+    try:
+        # Call your actual pipeline logic
+        generated_code = generate_pipeline_code(instruction)
+
+        return jsonify({'code': generated_code})
+
+    except Exception as e:
+        return jsonify({'code': f"# Error generating code: {str(e)}"})
+
+# On Render, remove this line; Gunicorn handles app startup
 if __name__ == "__main__":
     app.run(debug=True)
+
