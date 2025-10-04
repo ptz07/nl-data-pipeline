@@ -1,37 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Natural Language to Data Pipeline</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        textarea { width: 100%; height: 80px; }
-        .box { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
-        pre { background: #f8f8f8; padding: 10px; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NL → Data Pipeline</title>
+    <!-- Link to the new CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Natural Language → Data Pipeline</h1>
-    <form method="post">
-        <label>Enter your instruction:</label><br>
-        <textarea name="instruction"></textarea><br>
-        <button type="submit" name="generate">Generate</button>
-        <button type="submit" name="download">Generate & Download Code</button>
-    </form>
 
-    {% if steps %}
-    <div class="box">
-        <h2>Steps Understood:</h2>
-        <ul>
-            {% for step in steps %}
-            <li>{{ step }}</li>
-            {% endfor %}
-        </ul>
+    <div class="container">
+        <h1>NL → Data Pipeline Builder</h1>
+        <p>Enter your natural language instruction below and generate Python pipeline code.</p>
+
+        <!-- Input area -->
+        <textarea id="nl_input" rows="4" placeholder="Type something like: Load sales.csv, join with customers.csv, remove missing values, save as output.csv"></textarea>
+
+        <!-- Generate button -->
+        <button onclick="generatePipeline()">Generate & Download Code</button>
+
+        <!-- Results area -->
+        <div id="results" style="margin-top:20px; white-space: pre-wrap;"></div>
     </div>
 
-    <div class="box">
-        <h2>Generated Python Code:</h2>
-        <pre>{{ code }}</pre>
-    </div>
-    {% endif %}
+    <!-- Footer -->
+    <footer>
+        Created by Pronit Ray |
+        <a href="https://github.com/ptz07" target="_blank">GitHub</a> |
+        <a href="https://www.linkedin.com/feed/" target="_blank">LinkedIn</a>
+    </footer>
+
+    <!-- Optional JS for showing results -->
+    <script>
+        function generatePipeline() {
+            const input = document.getElementById('nl_input').value;
+            const results = document.getElementById('results');
+
+            // Dummy output, replace with Flask backend call
+            results.textContent = "Generated Python code for:\n" + input;
+        }
+    </script>
+
 </body>
 </html>
