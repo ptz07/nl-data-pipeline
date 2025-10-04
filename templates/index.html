@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NL → Data Pipeline Builder</title>
+    <title>Natural Language → Data Pipeline Builder</title>
     <style>
         body {
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: #ffffff;
             display: flex;
             flex-direction: column;
@@ -17,61 +17,85 @@
         .container {
             flex: 1;
             max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 12px;
+            margin: 60px auto;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        p {
+            text-align: center;
+            color: #cfcfcf;
         }
         textarea {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             font-size: 16px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: none;
             resize: vertical;
+            background: #1c1c1c;
+            color: white;
+            margin-top: 15px;
         }
         button {
-            margin-top: 15px;
-            padding: 10px 20px;
+            margin-top: 20px;
+            padding: 12px 25px;
             font-size: 16px;
             border: none;
             border-radius: 8px;
-            background-color: #6a11cb;
-            background-image: linear-gradient(315deg, #6a11cb 0%, #2575fc 74%);
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
             color: white;
             cursor: pointer;
+            transition: 0.3s ease;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         button:hover {
-            opacity: 0.9;
+            opacity: 0.85;
+            transform: scale(1.02);
         }
         .code-box {
-            margin-top: 20px;
-            padding: 10px;
-            background: #222;
-            border-radius: 8px;
+            margin-top: 25px;
+            padding: 15px;
+            background: #111;
+            border-radius: 10px;
             white-space: pre-wrap;
-            max-height: 300px;
+            max-height: 350px;
             overflow-y: auto;
+            border: 1px solid #444;
         }
         footer {
             text-align: center;
             padding: 15px;
-            background: #111;
+            font-size: 14px;
+            background: #0b0b0b;
+            color: #b0b0b0;
         }
         footer a {
-            color: #57c7ff;
+            color: #4cc9f0;
             text-decoration: none;
-            margin: 0 5px;
+            margin: 0 8px;
+            transition: 0.2s ease;
+        }
+        footer a:hover {
+            color: #74f2ce;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>NL → Data Pipeline Builder</h1>
+    <h1>Natural Language → Data Pipeline Builder</h1>
     <p>Enter your instruction below:</p>
 
-    <textarea id="nl_input" rows="5" placeholder="Type something like: Load sales.csv, join with customers.csv, remove missing values, save as output.csv"></textarea>
+    <textarea id="nl_input" rows="5" placeholder="e.g. Load sales.csv, join with customers.csv, drop missing values, save as output.csv"></textarea>
 
     <button onclick="generatePipeline()">Generate & Download Code</button>
 
@@ -79,27 +103,50 @@
 </div>
 
 <footer>
-    Created by Pronit Ray |
+    Created by <strong>Pronit Ray</strong> |
     <a href="https://github.com/ptz07" target="_blank">GitHub</a> |
     <a href="https://www.linkedin.com/feed/" target="_blank">LinkedIn</a>
 </footer>
 
 <script>
 async function generatePipeline() {
-    console.log("Button clicked"); // This **must** appear in console
+    console.log("Button clicked");
 
-    const input = document.getElementById('nl_input').value;
+    const input = document.getElementById('nl_input').value.trim();
     const results = document.getElementById('results');
-    results.textContent = "Processing...";
 
-    if (!input.trim()) {
-        results.textContent = "Please enter a natural language instruction.";
+    if (!input) {
+        results.textContent = "⚠️ Please enter a natural language instruction first.";
         return;
     }
 
-    // For now, we just simulate backend
-    console.log("Simulating backend response...");
-    results.textContent = `# Simulated generated code for: ${input}`;
+    results.textContent = "⏳ Processing your request...";
+
+    try {
+        const response = await fetch('/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ instruction: input })
+        });
+
+        if (!response.ok) throw new Error("Server returned " + response.status);
+
+        const data = await response.json();
+        console.log("Response data:", data);
+
+        results.textContent = data.code;
+
+        // Download file automatically
+        const blob = new Blob([data.code], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'generated_pipeline.py';
+        link.click();
+
+    } catch (err) {
+        console.error("Error in generatePipeline():", err);
+        results.textContent = "❌ Error generating code: " + err.message;
+    }
 }
 </script>
 
