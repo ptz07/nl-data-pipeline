@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, jsonify
-from pipeline_engine import generate_pipeline_code  # your existing logic
+from pipeline_engine import generate_pipeline_code
 
 app = Flask(__name__)
 
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
 @app.route('/generate', methods=['POST'])
@@ -16,15 +16,10 @@ def generate():
         return jsonify({'code': "# No instruction provided"})
 
     try:
-        # Call your actual pipeline logic
         generated_code = generate_pipeline_code(instruction)
-
         return jsonify({'code': generated_code})
-
     except Exception as e:
         return jsonify({'code': f"# Error generating code: {str(e)}"})
 
-# On Render, remove this line; Gunicorn handles app startup
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
-
