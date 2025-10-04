@@ -26,38 +26,48 @@
     </footer>
 
     <script>
-        async function generatePipeline() {
-            const input = document.getElementById('nl_input').value;
-            const results = document.getElementById('results');
+       async function generatePipeline() {
+    console.log("Button clicked");  // <- debug log
 
-            if (!input.trim()) {
-                results.textContent = "Please enter a natural language instruction.";
-                return;
-            }
+    const input = document.getElementById('nl_input').value;
+    console.log("Input value:", input);  // <- debug log
 
-            try {
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ instruction: input })
-                });
+    const results = document.getElementById('results');
 
-                if (!response.ok) throw new Error("Server error");
+    if (!input.trim()) {
+        results.textContent = "Please enter a natural language instruction.";
+        return;
+    }
 
-                const data = await response.json();
-                results.textContent = data.code;
+    try {
+        const response = await fetch('/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ instruction: input })
+        });
 
-                // Trigger download
-                const blob = new Blob([data.code], { type: 'text/plain' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'generated_pipeline.py';
-                link.click();
+        console.log("Fetch sent");  // <- debug log
 
-            } catch (err) {
-                results.textContent = "Error generating code: " + err.message;
-            }
-        }
+        if (!response.ok) throw new Error("Server error");
+
+        const data = await response.json();
+        console.log("Response data:", data);  // <- debug log
+
+        results.textContent = data.code;
+
+        // Trigger download
+        const blob = new Blob([data.code], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'generated_pipeline.py';
+        link.click();
+
+    } catch (err) {
+        console.error(err);
+        results.textContent = "Error generating code: " + err.message;
+    }
+}
+
     </script>
 
 </body>
