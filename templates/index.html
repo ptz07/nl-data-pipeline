@@ -25,51 +25,48 @@
         <a href="https://www.linkedin.com/feed/" target="_blank">LinkedIn</a>
     </footer>
 
-    <script>
-        // Fully working JS
-        document.getElementById('generateBtn').addEventListener('click', async function() {
-            console.log("Button clicked"); // debug log
+  <script>
+async function generatePipeline() {
+    console.log("Button clicked"); // debug log
 
-            const input = document.getElementById('nl_input').value;
-            console.log("Input value:", input);
+    const input = document.getElementById('nl_input').value;
+    const results = document.getElementById('results');
+    results.textContent = "Processing..."; // immediate feedback
 
-            const results = document.getElementById('results');
-            results.textContent = "Processing..."; // show immediate feedback
+    if (!input.trim()) {
+        results.textContent = "Please enter a natural language instruction.";
+        return;
+    }
 
-            if (!input.trim()) {
-                results.textContent = "Please enter a natural language instruction.";
-                return;
-            }
-
-            try {
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ instruction: input })
-                });
-
-                console.log("Fetch request sent");
-
-                if (!response.ok) throw new Error("Server returned " + response.status);
-
-                const data = await response.json();
-                console.log("Response data:", data);
-
-                results.textContent = data.code;
-
-                // Trigger download
-                const blob = new Blob([data.code], { type: 'text/plain' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'generated_pipeline.py';
-                link.click();
-
-            } catch (err) {
-                console.error("Error in generatePipeline():", err);
-                results.textContent = "Error generating code: " + err.message;
-            }
+    try {
+        const response = await fetch('/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ instruction: input })
         });
-    </script>
+
+        console.log("Fetch request sent");
+
+        if (!response.ok) throw new Error("Server returned " + response.status);
+
+        const data = await response.json();
+        console.log("Response data:", data);
+
+        results.textContent = data.code;
+
+        // Trigger download
+        const blob = new Blob([data.code], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'generated_pipeline.py';
+        link.click();
+
+    } catch (err) {
+        console.error("Error in generatePipeline():", err);
+        results.textContent = "Error generating code: " + err.message;
+    }
+}
+</script>
 
 </body>
 </html>
