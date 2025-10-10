@@ -12,6 +12,4 @@ This project allows users to describe a task in natural language, and the app ge
 
 💾 Downloadable Code — Instantly download generated pipeline scripts.
 
-💻 Modern Frontend — Sleek dark-themed interface with gradient backgrounds and responsive design.
-
 View the final webapp here: https://nl-data-pipeline.onrender.com/
